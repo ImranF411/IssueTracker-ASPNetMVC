@@ -23,30 +23,24 @@ namespace IssueTracker.Controllers
         // GET: Tickets
         public async Task<IActionResult> Index(string Creator, string searchString)
         {
-         IQueryable<User> creatorQuery = from u in _context.Users
-                                             orderby u.Name
-                                             select u;
-
          var tickets = from ticket in _context.Tickets
                           select ticket;
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                tickets = tickets.Where(ticket => ticket.Name.Contains(searchString));
+                tickets = tickets.Where(ticket => ticket.Subject.Contains(searchString));
             }
 
             if (!string.IsNullOrEmpty(Creator))
             {
-                var selectedCreator = (from u in _context.Users
-                                       where u.Name == Creator
-                                       select u).First();
+                User selectedCreator = GetSelectedUserByName(Creator);
 
                 tickets = tickets.Where(x => x.Creator == selectedCreator);
             }
 
             var creatorVM = new FilterViewModel
             {
-                Creators = new SelectList(await creatorQuery.Distinct().ToListAsync()),
+                Creators = await MakeCreatorSelectList(),
                 Tickets = await tickets.ToListAsync(),
             };
 
@@ -67,6 +61,8 @@ namespace IssueTracker.Controllers
             {
                 return NotFound();
             }
+            //Run this method to populate Creator property in ticket data. Data does not need to be retained.
+            await MakeCreatorSelectList();
 
             return View(tickets);
         }
@@ -74,13 +70,10 @@ namespace IssueTracker.Controllers
         // GET: Tickets/Create
         public async Task<IActionResult> Create()
         {
-            IQueryable<User> creatorQuery = from u in _context.Users
-                                            orderby u.Name
-                                            select u;
-            var creatorsList = new SelectList(await creatorQuery.Distinct().ToListAsync());
-            ViewData["CreatorsList"] = creatorsList;
+            var creatorsList = MakeCreatorSelectList();
+            ViewData["CreatorsList"] = await creatorsList;
 
-            var ticket = new Ticket { CreationDate = DateTime.Today, SeverityLevel=Enums.SeverityEnum.Normal, Status = Enums.StatusEnum.New};
+            var ticket = new Ticket { CreationDate = DateTime.Today, SeverityLevel = Enums.SeverityEnum.Normal, Status = Enums.StatusEnum.New };
             return View(ticket);
         }
 
@@ -89,19 +82,19 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CreationDate,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
+        public async Task<IActionResult> Create([Bind("Id,Subject,CreationDate,Description,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
         {
-            if (ModelState.IsValid)
+             if (ModelState.IsValid)
             {
-                var creator = (from u in _context.Users
-                                       where u.Name == selectedCreator
-                                       select u).First();
+                var creator = GetSelectedUserByName(selectedCreator);
                 tickets.Creator = creator;
                 _context.Add(tickets);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(tickets);
+
+            //Ticket creation invalid. Return initial create page to fill user dropdown, default date, status.
+            return await Create();
         }
 
         // GET: Tickets/Edit/5
@@ -118,10 +111,7 @@ namespace IssueTracker.Controllers
                 return NotFound();
             }
 
-            IQueryable<User> creatorQuery = from u in _context.Users
-                                            orderby u.Name
-                                            select u;
-            var creatorsList = new SelectList(await creatorQuery.Distinct().ToListAsync());
+            var creatorsList = await MakeCreatorSelectList();
             ViewData["CreatorsList"] = creatorsList;
 
             return View(tickets);
@@ -132,7 +122,7 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreationDate,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Subject,CreationDate,Description,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
         {
             if (id != tickets.Id)
             {
@@ -143,9 +133,7 @@ namespace IssueTracker.Controllers
             {
                 try
                 {
-                    var creator = (from u in _context.Users
-                                   where u.Name == selectedCreator
-                                   select u).First();
+                    var creator = GetSelectedUserByName(selectedCreator);
                     tickets.Creator = creator;
                     _context.Update(tickets);
                     await _context.SaveChangesAsync();
@@ -163,7 +151,9 @@ namespace IssueTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tickets);
+
+            //Ticket edit invalid. Return initial edit page to pre-fill fields.
+            return await Edit(id);
         }
 
         // GET: Tickets/Delete/5
@@ -180,6 +170,8 @@ namespace IssueTracker.Controllers
             {
                 return NotFound();
             }
+            //Run this method to populate Creator property in ticket data. Data does not need to be retained.
+            await MakeCreatorSelectList();
 
             return View(tickets);
         }
@@ -198,6 +190,22 @@ namespace IssueTracker.Controllers
         private bool TicketsExists(int id)
         {
             return _context.Tickets.Any(e => e.Id == id);
+        }
+
+        private async Task<SelectList> MakeCreatorSelectList()
+        {
+            IQueryable<User> creatorQuery = from u in _context.Users
+                                            orderby u.Name
+                                            select u;
+            var creatorsList = new SelectList(await creatorQuery.Distinct().ToListAsync());
+            return creatorsList;
+        }
+
+        private User GetSelectedUserByName(string name)
+        {
+            return (from u in _context.Users
+                    where u.Name == name
+                    select u).First();
         }
     }
 }

@@ -43,37 +43,41 @@ namespace IssueTracker.Models
                 context.Tickets.AddRange(
                     new Ticket
                     {
-                        Name = "There is a critical bug.",
+                        Subject = "There is a critical bug.",
                         CreationDate = DateTime.Now,
                         Creator = admin,
                         SeverityLevel = SeverityEnum.Critical,
-                        Status = StatusEnum.AwaitingCustomerResponse
+                        Status = StatusEnum.AwaitingCustomerResponse,
+                        Description = "This should be top priority"
                     },
 
                     new Ticket
                     {
-                        Name = "There is a less important bug.",
+                        Subject = "There is a less important bug.",
                         CreationDate = new DateTime(1993,4,11),
                         Creator = normalUser,
                         SeverityLevel = SeverityEnum.Low,
-                        Status = StatusEnum.Investigation
+                        Status = StatusEnum.Investigation,
+                        Description = "This should be low priority"
                     },
 
                      new Ticket
                      {
-                         Name = "There is a normal important bug.",
+                         Subject = "There is a normal important bug.",
                          CreationDate = new DateTime(2022,2, 17),
                          Creator = normalUser,
                          SeverityLevel = SeverityEnum.Normal,
-                         Status = StatusEnum.New
+                         Status = StatusEnum.New,
+                         Description = "This should be middle priority"
                      },
                       new Ticket
                       {
-                          Name = "There is a very important bug.",
+                          Subject = "There is a very important bug.",
                           CreationDate = new DateTime(2022,2,18),
                           Creator = normalUser,
                           SeverityLevel = SeverityEnum.Important,
-                          Status = StatusEnum.InDevelopment
+                          Status = StatusEnum.InDevelopment,
+                          Description = "This should be high priority"
                       }
                 );
                 context.SaveChanges();

@@ -9,11 +9,14 @@ namespace IssueTracker.Models
     public class Ticket
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
+        
+        [Required]
+        public string? Subject { get; set; }
 
+        [Required]
         public string? Description { get; set; }
 
-        [Display(Name = "Release Date")]
+        [Display(Name = "Creation Date")]
         [DataType(DataType.Date)]
         public DateTime CreationDate { get; set; }
         public User? Creator { get; set; }
