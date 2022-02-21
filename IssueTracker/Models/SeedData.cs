@@ -17,7 +17,8 @@ namespace IssueTracker.Models
             {
                 User admin = new User
                 {
-                    Name = "Adadm Minn",
+                    Name = "Adam Minn",
+                    Username = "Admin",
                     IsActive = true,
                     Role = "Admin"
                 };
@@ -26,6 +27,7 @@ namespace IssueTracker.Models
 
                 User normalUser = new User
                 {
+                    Username = "user",
                     Name = "Norma L. Euseur",
                     IsActive = true,
                     Role = "User"
