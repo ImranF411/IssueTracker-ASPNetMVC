@@ -39,7 +39,51 @@
             @Html.DisplayNameFor(model => model.SeverityLevel)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SeverityLevel)
+            @{
+                switch (Model.SeverityLevel)
+                {
+                    case IssueTracker.Enums.SeverityEnum.Critical:
+                        <p style="color: red; font: bold">CRITICAL</p>
+                        break;
+
+                    case IssueTracker.Enums.SeverityEnum.Important:
+                        <p style="color:darkorange; font: bold">Important</p>
+                        break;
+
+                    case IssueTracker.Enums.SeverityEnum.Low:
+                        <p style="color: blue">Low</p>
+                        break;
+
+                    default:
+                        <p>Normal</p>
+                        break;
+                }
+            }
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd class = "col-sm-10">
+            @{
+                switch (Model.Status)
+                {
+                    case IssueTracker.Enums.StatusEnum.Closed:
+                        <p style="color: green">Closed</p>
+                        break;
+
+                    case IssueTracker.Enums.StatusEnum.AwaitingCustomerResponse:
+                        <p>Awaiting Customer Response</p>
+                        break;
+
+                    case IssueTracker.Enums.StatusEnum.InDevelopment:
+                        <p>In Development</p>
+                        break;
+
+                    default:
+                        @Html.DisplayFor(model => model.Status)
+                        break;
+                }
+            }
         </dd>
     </dl>
     
