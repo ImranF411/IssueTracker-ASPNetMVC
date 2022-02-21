@@ -16,5 +16,7 @@ namespace IssueTracker.Data
         }
 
         public DbSet<IssueTracker.Models.Ticket> Tickets { get; set; }
+
+        public DbSet<IssueTracker.Models.User> Users { get; set; }
     }
 }

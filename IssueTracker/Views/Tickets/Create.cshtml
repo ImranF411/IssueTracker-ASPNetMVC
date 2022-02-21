@@ -24,7 +24,8 @@
             </div>
             <div class="form-group">
                 <label asp-for="Creator" class="control-label"></label>
-                <input asp-for="Creator" class="form-control" />
+                @*<input asp-for="Creator" class="form-control" />*@
+                <select asp-for="Creator" name="selectedCreator" asp-items="@((Microsoft.AspNetCore.Mvc.Rendering.SelectList) ViewData["CreatorsList"])"></select>
                 <span asp-validation-for="Creator" class="text-danger"></span>
             </div>
             <div class="form-group">

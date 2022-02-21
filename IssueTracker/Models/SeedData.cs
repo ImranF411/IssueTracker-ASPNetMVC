@@ -15,7 +15,25 @@ namespace IssueTracker.Models
                 serviceProvider.GetRequiredService<
                     DbContextOptions<IssueTrackerContext>>()))
             {
-                if(context.Tickets.Any())
+                User admin = new User
+                {
+                    Name = "Adadm Minn",
+                    IsActive = true,
+                    Role = "Admin"
+                };
+
+                if (!context.Users.Contains(admin)) { context.Users.Add(admin); }
+
+                User normalUser = new User
+                {
+                    Name = "Norma L. Euseur",
+                    IsActive = true,
+                    Role = "User"
+                };
+
+                if (!context.Users.Contains(normalUser)) { context.Users.Add(normalUser); }
+
+                if (context.Tickets.Any())
                 {
                     return;
                 }
@@ -25,31 +43,35 @@ namespace IssueTracker.Models
                     {
                         Name = "There is a critical bug.",
                         CreationDate = DateTime.Now,
-                        Creator = "John Smith",
-                        SeverityLevel = SeverityEnum.Critical
+                        Creator = admin,
+                        SeverityLevel = SeverityEnum.Critical,
+                        Status = StatusEnum.AwaitingCustomerResponse
                     },
 
                     new Ticket
                     {
                         Name = "There is a less important bug.",
                         CreationDate = new DateTime(1993,4,11),
-                        Creator = "Beeg Oohfs",
-                        SeverityLevel = SeverityEnum.Low
+                        Creator = normalUser,
+                        SeverityLevel = SeverityEnum.Low,
+                        Status = StatusEnum.Investigation
                     },
 
                      new Ticket
                      {
                          Name = "There is a normal important bug.",
                          CreationDate = new DateTime(2022,2, 17),
-                         Creator = "Asd If",
-                         SeverityLevel = SeverityEnum.Normal
+                         Creator = normalUser,
+                         SeverityLevel = SeverityEnum.Normal,
+                         Status = StatusEnum.New
                      },
                       new Ticket
                       {
                           Name = "There is a very important bug.",
                           CreationDate = new DateTime(2022,2,18),
-                          Creator = "Mana Manuh",
-                          SeverityLevel = SeverityEnum.Important
+                          Creator = normalUser,
+                          SeverityLevel = SeverityEnum.Important,
+                          Status = StatusEnum.InDevelopment
                       }
                 );
                 context.SaveChanges();

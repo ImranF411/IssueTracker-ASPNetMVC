@@ -21,9 +21,36 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Tickets
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string Creator, string searchString)
         {
-            return View(await _context.Tickets.ToListAsync());
+         IQueryable<User> creatorQuery = from u in _context.Users
+                                             orderby u.Name
+                                             select u;
+
+         var tickets = from ticket in _context.Tickets
+                          select ticket;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                tickets = tickets.Where(ticket => ticket.Name.Contains(searchString));
+            }
+
+            if (!string.IsNullOrEmpty(Creator))
+            {
+                var selectedCreator = (from u in _context.Users
+                                       where u.Name == Creator
+                                       select u).First();
+
+                tickets = tickets.Where(x => x.Creator == selectedCreator);
+            }
+
+            var creatorVM = new FilterViewModel
+            {
+                Creators = new SelectList(await creatorQuery.Distinct().ToListAsync()),
+                Tickets = await tickets.ToListAsync(),
+            };
+
+            return View(creatorVM);
         }
 
         // GET: Tickets/Details/5
@@ -45,9 +72,15 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Tickets/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var ticket = new Ticket { CreationDate = DateTime.Today, SeverityLevel=Enums.SeverityEnum.Normal};
+            IQueryable<User> creatorQuery = from u in _context.Users
+                                            orderby u.Name
+                                            select u;
+            var creatorsList = new SelectList(await creatorQuery.Distinct().ToListAsync());
+            ViewData["CreatorsList"] = creatorsList;
+
+            var ticket = new Ticket { CreationDate = DateTime.Today, SeverityLevel=Enums.SeverityEnum.Normal, Status = Enums.StatusEnum.New};
             return View(ticket);
         }
 
@@ -56,10 +89,14 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,CreationDate,Creator,SeverityLevel")] Ticket tickets)
+        public async Task<IActionResult> Create([Bind("Id,Name,CreationDate,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
         {
             if (ModelState.IsValid)
             {
+                var creator = (from u in _context.Users
+                                       where u.Name == selectedCreator
+                                       select u).First();
+                tickets.Creator = creator;
                 _context.Add(tickets);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -80,6 +117,13 @@ namespace IssueTracker.Controllers
             {
                 return NotFound();
             }
+
+            IQueryable<User> creatorQuery = from u in _context.Users
+                                            orderby u.Name
+                                            select u;
+            var creatorsList = new SelectList(await creatorQuery.Distinct().ToListAsync());
+            ViewData["CreatorsList"] = creatorsList;
+
             return View(tickets);
         }
 
@@ -88,7 +132,7 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreationDate,Creator,SeverityLevel")] Ticket tickets)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CreationDate,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
         {
             if (id != tickets.Id)
             {
@@ -99,6 +143,10 @@ namespace IssueTracker.Controllers
             {
                 try
                 {
+                    var creator = (from u in _context.Users
+                                   where u.Name == selectedCreator
+                                   select u).First();
+                    tickets.Creator = creator;
                     _context.Update(tickets);
                     await _context.SaveChangesAsync();
                 }
