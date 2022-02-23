@@ -26,7 +26,7 @@ namespace IssueTracker.Models
                 return false;
             if(obj.GetType() != typeof(User))
                 return false; 
-            return this.Id == ((User)obj).Id;
+            return this.Username == ((User)obj).Username;
         }
     }
 }

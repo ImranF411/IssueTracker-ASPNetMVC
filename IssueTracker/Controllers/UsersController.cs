@@ -55,7 +55,7 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,IsActive,Role")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Name,Username,IsActive,Role")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,IsActive,Role")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Username,IsActive,Role")] User user)
         {
             if (id != user.Id)
             {
