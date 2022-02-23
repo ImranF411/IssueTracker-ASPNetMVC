@@ -46,6 +46,7 @@ namespace IssueTracker.Models
                         Subject = "There is a critical bug.",
                         CreationDate = DateTime.Now,
                         Creator = admin,
+                        Assignee = admin,
                         SeverityLevel = SeverityEnum.Critical,
                         Status = StatusEnum.AwaitingCustomerResponse,
                         Description = "This should be top priority"
@@ -56,6 +57,7 @@ namespace IssueTracker.Models
                         Subject = "There is a less important bug.",
                         CreationDate = new DateTime(1993,4,11),
                         Creator = normalUser,
+                        Assignee = admin,
                         SeverityLevel = SeverityEnum.Low,
                         Status = StatusEnum.Investigation,
                         Description = "This should be low priority"
@@ -66,6 +68,7 @@ namespace IssueTracker.Models
                          Subject = "There is a normal important bug.",
                          CreationDate = new DateTime(2022,2, 17),
                          Creator = normalUser,
+                         Assignee= normalUser,
                          SeverityLevel = SeverityEnum.Normal,
                          Status = StatusEnum.New,
                          Description = "This should be middle priority"
@@ -75,6 +78,7 @@ namespace IssueTracker.Models
                           Subject = "There is a very important bug.",
                           CreationDate = new DateTime(2022,2,18),
                           Creator = normalUser,
+                          Assignee = normalUser,
                           SeverityLevel = SeverityEnum.Important,
                           Status = StatusEnum.InDevelopment,
                           Description = "This should be high priority"

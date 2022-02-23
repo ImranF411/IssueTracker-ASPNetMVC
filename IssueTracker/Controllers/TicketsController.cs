@@ -21,7 +21,7 @@ namespace IssueTracker.Controllers
         }
 
         // GET: Tickets
-        public async Task<IActionResult> Index(string Creator, string searchString)
+        public async Task<IActionResult> Index(string Creator, string Assignee, string searchString)
         {
          var tickets = from ticket in _context.Tickets
                           select ticket;
@@ -38,10 +38,21 @@ namespace IssueTracker.Controllers
                 tickets = tickets.Where(x => x.Creator == selectedCreator);
             }
 
+            if (!string.IsNullOrEmpty(Assignee))
+            {
+                User selectedCreator = GetSelectedUserByName(Assignee);
+
+                tickets = tickets.Where(x => x.Assignee == selectedCreator);
+            }
+
+            var userSelectList = await MakeUserSelectList();
+
             var creatorVM = new FilterViewModel
             {
-                Creators = await MakeCreatorSelectList(),
+                Creators = userSelectList,
+                Assignees = userSelectList,
                 Tickets = await tickets.ToListAsync(),
+                SearchString = searchString
             };
 
             return View(creatorVM);
@@ -62,7 +73,7 @@ namespace IssueTracker.Controllers
                 return NotFound();
             }
             //Run this method to populate Creator property in ticket data. Data does not need to be retained.
-            await MakeCreatorSelectList();
+            await MakeUserSelectList();
 
             return View(tickets);
         }
@@ -70,8 +81,8 @@ namespace IssueTracker.Controllers
         // GET: Tickets/Create
         public async Task<IActionResult> Create()
         {
-            var creatorsList = MakeCreatorSelectList();
-            ViewData["CreatorsList"] = await creatorsList;
+            var usersList = MakeUserSelectList();
+            ViewData["UsersList"] = await usersList;
 
             var ticket = new Ticket { CreationDate = DateTime.Today, SeverityLevel = Enums.SeverityEnum.Normal, Status = Enums.StatusEnum.New };
             return View(ticket);
@@ -82,12 +93,16 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Subject,CreationDate,Description,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
+        public async Task<IActionResult> Create([Bind("Id,Subject,Description,CreationDate,Creator,Assignee,SeverityLevel,Status")] Ticket tickets, string selectedCreator, string assignedUser)
         {
              if (ModelState.IsValid)
             {
                 var creator = GetSelectedUserByName(selectedCreator);
+                var assignee = GetSelectedUserByName(assignedUser);
                 tickets.Creator = creator;
+                tickets.Assignee = assignee;
+                tickets.Status = Enums.StatusEnum.New;
+
                 _context.Add(tickets);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -111,8 +126,8 @@ namespace IssueTracker.Controllers
                 return NotFound();
             }
 
-            var creatorsList = await MakeCreatorSelectList();
-            ViewData["CreatorsList"] = creatorsList;
+            var usersList = MakeUserSelectList();
+            ViewData["UsersList"] = await usersList;
 
             return View(tickets);
         }
@@ -122,7 +137,7 @@ namespace IssueTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Subject,CreationDate,Description,Creator,SeverityLevel,Status")] Ticket tickets, string selectedCreator)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Subject,Description,CreationDate,Creator,Assignee,SeverityLevel,Status")] Ticket tickets, string selectedCreator, string assignedUser)
         {
             if (id != tickets.Id)
             {
@@ -133,8 +148,8 @@ namespace IssueTracker.Controllers
             {
                 try
                 {
-                    var creator = GetSelectedUserByName(selectedCreator);
-                    tickets.Creator = creator;
+                    SetTicketCreatorAssignee(tickets, selectedCreator, assignedUser);
+
                     _context.Update(tickets);
                     await _context.SaveChangesAsync();
                 }
@@ -149,11 +164,23 @@ namespace IssueTracker.Controllers
                         throw;
                     }
                 }
+                catch (Exception ex)
+                {
+                    var message = ex.Message;
+                }
                 return RedirectToAction(nameof(Index));
             }
 
             //Ticket edit invalid. Return initial edit page to pre-fill fields.
             return await Edit(id);
+        }
+
+        private void SetTicketCreatorAssignee(Ticket tickets, string selectedCreator, string assignedUser)
+        {
+            var creator = GetSelectedUserByName(selectedCreator);
+            var assignee = GetSelectedUserByName(assignedUser);
+            tickets.Creator = creator;
+            tickets.Assignee = assignee;
         }
 
         // GET: Tickets/Delete/5
@@ -171,7 +198,7 @@ namespace IssueTracker.Controllers
                 return NotFound();
             }
             //Run this method to populate Creator property in ticket data. Data does not need to be retained.
-            await MakeCreatorSelectList();
+            await MakeUserSelectList();
 
             return View(tickets);
         }
@@ -192,7 +219,7 @@ namespace IssueTracker.Controllers
             return _context.Tickets.Any(e => e.Id == id);
         }
 
-        private async Task<SelectList> MakeCreatorSelectList()
+        private async Task<SelectList> MakeUserSelectList()
         {
             IQueryable<User> creatorQuery = from u in _context.Users
                                             orderby u.Name

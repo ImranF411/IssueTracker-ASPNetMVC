@@ -19,8 +19,14 @@ namespace IssueTracker.Models
         [Display(Name = "Creation Date")]
         [DataType(DataType.Date)]
         public DateTime CreationDate { get; set; }
+        
         public User? Creator { get; set; }
+
+        [Display(Name = "Assigned To")] 
+        public User? Assignee { get; set; }
+        
         public SeverityEnum? SeverityLevel { get; set; }
+        
         public StatusEnum? Status { get; set; }
 
         [NotMapped]

@@ -23,15 +23,20 @@
                 <input asp-for="CreationDate" class="form-control" />
                 <span asp-validation-for="CreationDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Creator" class="control-label"></label>
-                <select asp-for="Creator" name="selectedCreator" asp-items="@((Microsoft.AspNetCore.Mvc.Rendering.SelectList) ViewData["CreatorsList"])"></select>
-                <span asp-validation-for="Creator" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Creator" class="control-label"></label>
+                <select asp-for="Creator" name="selectedCreator" asp-items="@((Microsoft.AspNetCore.Mvc.Rendering.SelectList) ViewData["UsersList"])"></select>
+                <span asp-validation-for="Creator" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Assignee" class="control-label"></label>
+                <select asp-for="Assignee" name="assignedUser" asp-items="@((Microsoft.AspNetCore.Mvc.Rendering.SelectList) ViewData["UsersList"])"></select>
+                <span asp-validation-for="Assignee" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="SeverityLevel" class="control-label"></label>
