@@ -26,7 +26,7 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>
@@ -70,15 +70,15 @@
                     switch (item.SeverityLevel)
                     {
                         case IssueTracker.Enums.SeverityEnum.Critical:
-                            <p style="color: red; font: bold">CRITICAL</p>
+                            <p class="text-danger"><strong>CRITICAL</strong></p>
                             break;
 
                         case IssueTracker.Enums.SeverityEnum.Important:
-                            <p style="color:darkorange; font: bold">Important</p>
+                            <p class="text-warning" style="font: bold">Important</p>
                             break;
 
                         case IssueTracker.Enums.SeverityEnum.Low:
-                            <p style="color: blue">Low</p>
+                            <p class="text-info">Low</p>
                             break;
 
                         default:
@@ -92,7 +92,7 @@
                     switch (item.Status)
                     {
                         case IssueTracker.Enums.StatusEnum.Closed:
-                            <p style="color: green">Closed</p>
+                            <p class="text-success">Closed</p>
                             break;
 
                         case IssueTracker.Enums.StatusEnum.AwaitingCustomerResponse:
