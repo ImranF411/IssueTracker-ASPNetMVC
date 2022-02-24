@@ -6,7 +6,7 @@
 
 <h1>Index</h1>
 
-<form asp-controller="Tickets" asp-action="Index" method="get">
+<form asp-controller="Tickets" asp-action="Index" method="get" class="d-flex">
     <p>Filter by:</p>
     <p>
         Creator:
@@ -18,10 +18,10 @@
             <option value="">All</option>
         </select>
          | Search title: <input type="text" name="SearchString" />
-        <input type="submit" value="Filter" />
+         &nbsp;
+        <button type="submit" class="btn btn-primary">Filter</button>
     </p>
 </form>
-<section></section>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
