@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using IssueTracker.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace IssueTracker.Data
 {
-    public class IssueTrackerContext : DbContext
+    public class IssueTrackerContext : IdentityDbContext
     {
         public IssueTrackerContext (DbContextOptions<IssueTrackerContext> options)
             : base(options)
