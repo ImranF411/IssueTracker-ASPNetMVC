@@ -8,9 +8,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using IssueTracker.Data;
 using IssueTracker.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace IssueTracker.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly IssueTrackerContext _context;
